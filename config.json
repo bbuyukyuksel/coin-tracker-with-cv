@@ -1,0 +1,45 @@
+{
+   "ocr_settings": {
+      "tesseract_path": "C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe",
+      "resize": 2
+   },
+   "links": {
+      "base_link": "https://www.linkedin.com/in/buyukyukselburak/",
+      "bonusbitcoin": "http://bonusbitcoin.co/faucet",
+      "bitcoinker": "https://bitcoinker.com/",
+      "freebitco": "https://freebitco.in/",
+      "coinpot": "https://coinpot.co/dashboard"
+   },
+   "payment_solver": {
+      "bitcoinker": {
+         "region_offset": [
+            -20,
+            0
+         ]
+      }
+   },
+   "location": {
+      "base": [
+         0,
+         0
+      ],
+      "url_area": [
+         172,
+         47,
+         205,
+         23
+      ],
+      "url_text": [
+         329,
+         59
+      ],
+      "scrollbar_top": [
+         950,
+         130
+      ],
+      "scrollbar_bottom": [
+         950,
+         1010
+      ]
+   }
+}
