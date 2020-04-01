@@ -17,7 +17,7 @@ def fix_false_chs(string):
     string = string.replace(i, j)
   return string
 
-def doOcr(img, show=False):
+def doOcr(img, show=False, save=''):
   config = tools.JSON.get("config.json")
   scale = config["ocr_settings"]["resize"]
   img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
@@ -26,6 +26,8 @@ def doOcr(img, show=False):
   size = tuple(np.array(th2.shape) * scale)
   size = (int(size[1]), int(size[0])) 
   sized = cv2.resize(th2.copy(), dsize=size, interpolation=cv2.INTER_CUBIC)
+  if save:
+    cv2.imwrite(save, sized)
   if show:
     cv2.imshow("current text", sized)
     cv2.waitKey(1000)
@@ -67,12 +69,12 @@ def resolve_url():
   result = doOcr(img_url_bar)
   return result
 
-def resolve_region(region, show=False):
+def resolve_region(region, show=False, save=''):
   ss_region = pyautogui.screenshot(region=region)
   img_url_bar = np.array(ss_region) 
   # Convert RGB to BGR 
   img_url_bar = img_url_bar[:, :, ::-1].copy() 
-  result = doOcr(img_url_bar, show)
+  result = doOcr(img_url_bar, show, save)
   return result
 
 def check_current_url():

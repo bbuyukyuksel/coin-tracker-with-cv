@@ -50,7 +50,7 @@ class Commands:
             self.go_to_top()
     
     def scrolldown(self, s_time=None):
-        if self.find("assets/process/eof.png"):
+        if self.find("assets/process/eof"):
             return "eof"
         
         self.mouse.position = self.config["location"]["scrollbar_bottom"]
@@ -62,7 +62,7 @@ class Commands:
             self.mouse.release(Mouse.Button.left)
     
     def scrollup(self, s_time=None):
-        if self.find("assets/process/bof.png"):
+        if self.find("assets/process/bof"):
             return "eof"
         
         self.mouse.position = self.config["location"]["scrollbar_top"]
@@ -91,7 +91,7 @@ class Commands:
 
         else:
             print("> checking dir:", path)
-            for index, file in enumerate(glob.glob(f"{path}/*")):
+            for index, file in enumerate(glob.glob(f"{path}/*.png")):
                 pos = self.find(file, center=center)
                 if pos:
                     self.mouse.position = pos
@@ -148,9 +148,48 @@ class Commands:
                 print(">> EOF")
                 break
             time.sleep(1)
+    def solve_recaptha(self, s_time=2):
+        self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=True)
+        self.find_and_click(r'assets/box')
+        time.sleep(s_time)
+        # Kutuya Tıklandı
+        pos = self.find(r'assets/solver/person.png', center=True)
+        if pos:
+            # Enable Solver
+            while not self.find(r'assets/iamnotarobot-done'):
+                self.mouse.position = pos
+                self.click_l()
+                time.sleep(2)
+                refresh_pos = self.find(r'assets/solver/refresh.png', center=True)
+                if refresh_pos:
+                    self.mouse.position = refresh_pos
+                    self.click_l()
+    
+    def payment_solver(self, selected_link):
+        self.wait_for("Basarılı mı?", f'assets/{selected_link}/success', scrolldown_enabled=True)
+        offset = self.config["payment_solver"][selected_link]["region_offset"]
+        pos = self.find(f'assets/{selected_link}/resolve_payment')
+        if pos:
+            pos = list(pos)
+            pos[0] += offset[0]
+            pos[1] += offset[1]
+            pos[2] = offset[2]
+            pos[3] = offset[3]
+            payment_solver_text = OCR.resolve_region(pos, show=True, save=f"payments/{str(datetime.datetime.now()).split('.')[0].replace(':','-')}.png")
+            print("Payment Image Pos:", pos)
+            payment_amount = re.match("\d+", payment_solver_text)
+            if payment_amount:
+                with open(f"payments/{selected_link}.txt", 'a+') as f:
+                    str_log = f"#Time: {str(datetime.datetime.now()).split('.')[0]}, #Payment: {payment_amount[0]}" 
+                    print(str_log)
+                    f.write(str_log + "\n")
+        else:
+            print("Could not detect payment solver image")
+                
+                
 
-if __name__ == '__main__':
-    _box_ = "assets/box"
+
+def bitcoinker():    
     _iamnotarobot_ = "assets/iamnotarobot"
     _iamnotarobot_done_ = "assets/iamnotarobot-done"
 
@@ -158,38 +197,58 @@ if __name__ == '__main__':
     links = config["links"]
     
     cmd = Commands()
-    cmd.is_animation_on = True
+    cmd.is_animation_on = False
     selected_link = "bitcoinker"
 
     cmd.link(links[selected_link])
-    cmd.wait_for("HTML is done?", r'assets/process/htmlisdone.png', scrolldown_enabled=False)
+    cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
     # TODO
     # Solver eklenecek.
-    cmd.wait_for("I'am not a robot bulunacak.", _iamnotarobot_, scrolldown_enabled=True)
-    cmd.find_and_click(_box_)
+    cmd.solve_recaptha()
     # .... SOLVER .... 
     cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
-    cmd.wait_for("Claim edilcek.", r'assets\bitcoinker', scrolldown_enabled=True)
-    cmd.find_and_click(r'assets\bitcoinker\claim_bitcoin.png')
+    cmd.wait_for("Claim edilcek.", r'assets\bitcoinker\claim_bitcoin', scrolldown_enabled=True)
+    cmd.find_and_click(r'assets\bitcoinker\claim_bitcoin')
     time.sleep(2)
-    cmd.wait_for("Basarılı mı?", r'assets\bitcoinker\success-v2.png', scrolldown_enabled=True)
     
-    offset = config["payment_solver"][selected_link]["region_offset"]
-    pos = cmd.find(r'assets\bitcoinker\resolve_payment.png')
-    if pos:
-        pos = list(pos)
-        pos[0] += offset[0]
-        pos[1] += offset[1]
-        payment_solver_text = OCR.resolve_region(pos, show=True)
-        payment_amount = re.match("\d+", payment_solver_text)
-        if payment_amount:
-            with open(f"payments/{selected_link}.txt", 'a+') as f:
-                str_log = f"#Time: {str(datetime.datetime.now()).split('.')[0]}, #Payment: {payment_amount[0]}" 
-                print(str_log)
-                f.write(str_log + "\n")
-    else:
-        print("Could not detect payment solver image")
+    cmd.payment_solver(selected_link)
+    
+    
+    cmd.link("www.google.com")
 
+def bonusbitcoin():
+    
+    _iamnotarobot_ = "assets/iamnotarobot"
+    _iamnotarobot_done_ = "assets/iamnotarobot-done"
+    config = tools.JSON.get("config.json")
+    links = config["links"]
+    cmd = Commands()
+    cmd.is_animation_on = False
+    selected_link = "bonusbitcoin"
+    
+    cmd.link(links[selected_link])
+    cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
+    # TODO
+    # Solver eklenecek.
+    cmd.solve_recaptha()
+    # .... SOLVER .... 
+    cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
+    cmd.wait_for("Claim edilcek.", f'assets\{selected_link}\claim_now.png', scrolldown_enabled=True)
+    cmd.find_and_click(f'assets\{selected_link}\claim_now.png')
+    time.sleep(2)
+    
+    cmd.payment_solver(selected_link)
+    
+    
+    #cmd.link("www.google.com")
+
+if __name__ == '__main__':
+    while True:
+        print("Sleeping 5 mins")
+        time.sleep(5 * 60)
+        bitcoinker()
+        #bonusbitcoin()
+        
 
     '''
     config = tools.JSON.get("config.json")

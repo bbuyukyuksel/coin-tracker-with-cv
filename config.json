@@ -11,12 +11,9 @@
       "coinpot": "https://coinpot.co/dashboard"
    },
    "payment_solver": {
-      "bitcoinker": {
-         "region_offset": [
-            -20,
-            0
-         ]
-      }
+      "info":"test_func.py kodu kullanarak tespit et.",
+      "bitcoinker": {"region_offset": [-20,0,300, 23]},
+      "bonusbitcoin": {"region_offset": [-66,0,116,15]}
    },
    "location": {
       "base": [
