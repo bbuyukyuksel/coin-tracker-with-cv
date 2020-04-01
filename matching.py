@@ -87,7 +87,7 @@ def matching(template_img_path, source="screenshot", debug=False, score_threshol
 if __name__ == '__main__':
     config = tools.JSON.get("config.json")
 
-    path = r'assets/bitcoinker/success\success-1.png'
+    path = r'assets/solver/person.png'
     pos = matching(template_img_path=path, source="screenshot", debug=True, score_threshold=config["ocr_settings"]['matching_threshold'], center=True)
     if pos:
         mouse = Mouse.Controller()

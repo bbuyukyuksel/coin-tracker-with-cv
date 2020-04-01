@@ -5,6 +5,8 @@ import tools
 import time
 from pynput import keyboard as Keyboard
 import OCR
+import datetime
+import globals
 
 def bitcoinker():
     '''
@@ -15,7 +17,7 @@ def bitcoinker():
     config = tools.JSON.get("config.json")
     links = config["links"]
     cmd = Commands()
-    cmd.is_animation_on = False
+    cmd.is_animation_on = True
     selected_link = "bitcoinker"
     cmd.link(links[selected_link])
     cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
@@ -42,7 +44,7 @@ def bonusbitcoin():
     config = tools.JSON.get("config.json")
     links = config["links"]
     cmd = Commands()
-    cmd.is_animation_on = False
+    cmd.is_animation_on = True
     selected_link = "bonusbitcoin"
     
     cmd.link(links[selected_link])
@@ -61,15 +63,14 @@ def bonusbitcoin():
     cmd.link("www.google.com")
 
 def automate(recipe_handler, sleeptime, stop_event):
-    global WAIT
+    
     recipe_counter = 1
     while not stop_event.wait(1):
-        print(f"Recipe name: {recipe_handler.__doc__} -> {recipe_counter}. kez gerçekleşti.")
-        sleep(sleeptime)
-        while WAIT:
+
+        while globals.WAIT:
             print("Uyuyor")
             sleep(5)
-        WAIT = True
+        globals.WAIT = True
         recipe_handler()
         
         # Close Tabs
@@ -82,13 +83,14 @@ def automate(recipe_handler, sleeptime, stop_event):
             else:
                 break
         print("Tablar Kapatıldı..")
-        WAIT = False
+        globals.WAIT = False
         recipe_counter += 1
+        sleep(sleeptime)
+        print(f"Recipe name: {recipe_handler.__doc__} -> {recipe_counter}. kez gerçekleşti.")
 
         
 
-global WAIT
-WAIT = False
+globals.WAIT = False
 
 def on_release(key):
     global thread_kill_signal
@@ -111,8 +113,25 @@ if __name__ == '__main__':
     listener = Keyboard.Listener(on_release=on_release)
     listener.start()
 
+
+    threads = []
     for recipe_name in recipe_times.keys():
         x = Thread(target=automate, args=(eval(recipe_name),recipe_times[recipe_name], thread_kill_signal))
         x.start()
+        threads.append([recipe_name, x])
+    
+    
+    while not thread_kill_signal.wait(1.5):
+        with open("logs/thread_status.txt", 'a+') as f:
+            for i in threads:
+                str_log = f"{str(datetime.datetime.now()).split('.')[0]} Recipe: {i[0]}, is_alive: {i[1].is_alive()}, wait_status:{globals.WAIT}\n"
+                f.write(str_log)
+                
+                if not i[1].is_alive():
+                    str_log = f">>> {str(datetime.datetime.now()).split('.')[0]} Tekrar uyandırılıyor Recipe: {i[0]}"
+                    print(str_log)
+                    i[1] = Thread(target=automate, args=(eval(i[0]),recipe_times[i[0]], thread_kill_signal))
+                    i[1].start()
 
     
+

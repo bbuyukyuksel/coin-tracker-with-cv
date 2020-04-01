@@ -9,7 +9,7 @@ import OCR
 import re
 import datetime
 import matching
-
+import globals
 
 class Commands:
     
@@ -114,9 +114,16 @@ class Commands:
         self.click_l()
 
         
-    def wait_for(self, title, path, scrolldown_enabled=False, scrollup_enabled=False, try_limit=3, sensitive=False):
+    def wait_for(self, title, path, scrolldown_enabled=False, scrollup_enabled=False, try_limit=2, sensitive=False, timeout = 120):
         trying = 0
+        begin_time = datetime.datetime.now()
         while True:
+            
+            if (datetime.datetime.now() - begin_time).seconds > globals.TIMEOUT:
+                print("Timeout", globals.WAIT)
+                globals.WAIT = False
+                exit(0)
+                break
             print(f"> waiting for : {title}")
             if self.find(path, sensitive=sensitive):
                 print("> waiting is completed!")
@@ -164,6 +171,9 @@ class Commands:
         if pos:
             # Enable Solver
             while not self.find(r'assets/iamnotarobot-done'):
+                pos = self.find(r'assets/solver/person.png', center=True)
+                if not pos:
+                    continue
                 self.mouse.position = pos
                 self.click_l()
                 time.sleep(2)

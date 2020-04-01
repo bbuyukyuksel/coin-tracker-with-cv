@@ -54,6 +54,26 @@ def close_tab():
     keyboard.release('w')
   print("Tab Kapatıldı.")
 
+def close_tab_with_ctrl_tab():
+  time.sleep(2)
+  print("Tab Kapatılıyor..")
+  keyboard = Keyboard.Controller()
+  
+  keyboard.press(Keyboard.Key.esc)
+  time.sleep(0.1)
+  keyboard.release(Keyboard.Key.esc)
+  
+  with keyboard.pressed(Keyboard.Key.ctrl_l):
+    keyboard.press(Keyboard.Key.tab)
+    keyboard.release(Keyboard.Key.tab)
+    
+  with keyboard.pressed(Keyboard.Key.ctrl_l):
+    keyboard.press('w')
+    keyboard.release('w')
+  
+
+  
+
 def resolve_url():
   if '__first_trigger__' not in resolve_url.__dict__:    
     config = tools.JSON.get("config.json")
