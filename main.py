@@ -129,6 +129,7 @@ if __name__ == '__main__':
                 
                 if not i[1].is_alive():
                     str_log = f">>> {str(datetime.datetime.now()).split('.')[0]} Tekrar uyandırılıyor Recipe: {i[0]}"
+                    f.write(str_log)
                     print(str_log)
                     i[1] = Thread(target=automate, args=(eval(i[0]),recipe_times[i[0]], thread_kill_signal))
                     i[1].start()
