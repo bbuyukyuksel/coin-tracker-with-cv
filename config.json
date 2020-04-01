@@ -1,7 +1,8 @@
 {
    "ocr_settings": {
       "tesseract_path": "C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe",
-      "resize": 2
+      "resize": 2,
+      "matching_threshold" : 0.003
    },
    "links": {
       "base_link": "https://www.linkedin.com/in/buyukyukselburak/",
