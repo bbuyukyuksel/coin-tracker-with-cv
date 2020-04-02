@@ -23,6 +23,7 @@ def bitcoinker():
     cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
     # Solve Recaptha
     if cmd.solve_recaptcha():
+        print("solve_recaptcha fail")
         return
     # _____________________________
     cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
@@ -32,8 +33,6 @@ def bitcoinker():
     # Payment Solver
     cmd.payment_solver(selected_link, sensitive=True)
     # _____________________________
-
-    
     cmd.link("www.google.com")
 
 def bonusbitcoin():
@@ -42,6 +41,7 @@ def bonusbitcoin():
     '''
     _iamnotarobot_ = "assets/iamnotarobot"
     _iamnotarobot_done_ = "assets/iamnotarobot-done"
+
     config = tools.JSON.get("config.json")
     links = config["links"]
     cmd = Commands()
@@ -50,13 +50,12 @@ def bonusbitcoin():
     
     cmd.link(links[selected_link])
     cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
-    # TODO
     
     if cmd.solve_recaptcha():
+        print("solve_recaptcha fail")
         return
     
     cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
-
     cmd.wait_for("Claim edilcek.", f'assets\{selected_link}\claim_now.png', scrolldown_enabled=True, sensitive=True)
     cmd.find_and_click(f'assets\{selected_link}\claim_now.png', sensitive=True)
     time.sleep(2)
@@ -65,10 +64,10 @@ def bonusbitcoin():
     cmd.link("www.google.com")
 
 def automate(recipe_handler, sleeptime, stop_event):
-    
     recipe_counter = 1
     while not stop_event.wait(1):
-
+        print(recipe_handler, "çalışıyor..")
+        sleep(sleeptime)
         while globals.WAIT:
             print("Uyuyor")
             sleep(5)
@@ -87,7 +86,6 @@ def automate(recipe_handler, sleeptime, stop_event):
         print("Tablar Kapatıldı..")
         globals.WAIT = False
         recipe_counter += 1
-        sleep(sleeptime)
         print(f"Recipe name: {recipe_handler.__doc__} -> {recipe_counter}. kez gerçekleşti.")
 
         

@@ -17,9 +17,10 @@
       "bonusbitcoin": {"region_offset": [-66,0,116,15]}
    },
    "location": {
+      "widthxheight":[1920, 1080],
       "base": [
-         0,
-         0
+         800,
+         500
       ],
       "url_area": [
          172,

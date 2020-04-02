@@ -81,8 +81,9 @@ class Commands:
     def find(self, path, center=False, sensitive=False):
         pos = None
         if not os.path.isdir(path):
-            self.mouse.position = self.config["location"]['base']
-
+            base_pos = list(self.config["location"]['widthxheight'])
+            self.mouse.position = ((base_pos[0]//2)+50,base_pos[1]//2)
+            
             if sensitive:
                 print(">> Sensitive Mode: Enabled")
                 pos = matching.matching(template_img_path=path, source="screenshot", debug=False, score_threshold=self.config["ocr_settings"]['matching_threshold'], center=center)
