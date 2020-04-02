@@ -49,7 +49,10 @@ class Commands:
         self.mouse.click(Mouse.Button.left, count)
         # Check URL
         if OCR.check_current_url():
+            time.sleep(1)
             self.go_to_top()
+            return True
+        return False
     
     def scrolldown(self, s_time=None):
         if self.find("assets/process/eof"):
@@ -106,28 +109,38 @@ class Commands:
             return None
             
     def find_and_click(self, path, sensitive=False):
-        '''
-            dir destekleyecek.
-        '''
         pos = self.find(path, center=True, sensitive=True) 
         self.mouse.position = pos
-        self.click_l()
+        return self.click_l()
 
         
-    def wait_for(self, title, path, scrolldown_enabled=False, scrollup_enabled=False, try_limit=2, sensitive=False, timeout = 120):
+    def wait_for(self, title, path, scrolldown_enabled=False, try_limit=2, sensitive=False, timeout = None):
         trying = 0
+        __alert__ = 0
+        __timeout_flag__ = False
+        __exit_flag__ = False
         begin_time = datetime.datetime.now()
+
+        if not timeout:
+            timeout = globals.TIMEOUT
+        
         while True:
-            
-            if (datetime.datetime.now() - begin_time).seconds > globals.TIMEOUT:
-                print("Timeout", globals.WAIT)
-                globals.WAIT = False
-                exit(0)
+            # Timeout Control
+            if (datetime.datetime.now() - begin_time).seconds > timeout:
+                __timeout_flag__ = True
                 break
+            # Alert Control
+            if (__alert__ > 10):
+                __exit_flag__ = True        
+                break
+
             print(f"> waiting for : {title}")
             if self.find(path, sensitive=sensitive):
                 print("> waiting is completed!")
                 break
+            else:
+                __alert__ += 1
+
             if scrolldown_enabled:
                 is_eof = self.scrolldown()
                 if is_eof:
@@ -138,14 +151,13 @@ class Commands:
                         self.go_to_top()
                     else:
                         print("Could not found, Tring Limit:", trying)
+                        __exit_flag__ = True
                         break
-            elif scrollup_enabled:
-                is_bof = self.scrollup()
-                if is_bof:
-                    print(">> BOF")
-                    break
             #Kaldırılacak!
             time.sleep(1)
+
+        # if an error occured return True Flag
+        return __timeout_flag__ or __exit_flag__
     
     def go_to_top(self):
         while True:
@@ -162,26 +174,45 @@ class Commands:
                 print(">> EOF")
                 break
             time.sleep(1)
-    def solve_recaptha(self, s_time=2):
-        self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=True)
-        self.find_and_click(r'assets/box')
-        time.sleep(s_time)
+    
+    def solve_recaptcha(self, s_time=2):
+        __critical_alert_flag__ = 0
+        __critical_alert_count__ = 15
+
+        while True:
+            if __critical_alert_flag__ > __critical_alert_count__:
+                break
+            __critical_alert_flag__ += 1
+            self.go_to_top()
+            self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=True)
+            if not self.find_and_click(r'assets/box'):
+                break
+            time.sleep(s_time)
+
+        __critical_alert_flag__ = 0
         # Kutuya Tıklandı
         pos = self.find(r'assets/solver/person.png', center=True)
         if pos:
             # Enable Solver
             while not self.find(r'assets/iamnotarobot-done'):
+                if __critical_alert_flag__ > __critical_alert_count__:
+                    break
+
+                __critical_alert_flag__ += 1
                 pos = self.find(r'assets/solver/person.png', center=True)
                 if not pos:
                     continue
                 self.mouse.position = pos
                 self.click_l()
-                time.sleep(2)
-                refresh_pos = self.find(r'assets/solver/refresh.png', center=True)
-                if refresh_pos:
-                    self.mouse.position = refresh_pos
-                    self.click_l()
-    
+                refresh_flag = self.wait_for("Process'in kabulü bekleniyor...", f"assets/iamnotarobot-done", timeout=30)
+                if refresh_flag:
+                    refresh_pos = self.find(r'assets/solver/refresh.png', center=True)
+                    if refresh_pos:
+                        self.mouse.position = refresh_pos
+                        self.click_l()
+        # If an error occured return error flag : True
+        return __critical_alert_flag__ > __critical_alert_count__
+
     def payment_solver(self, selected_link, sensitive=False):
         self.wait_for("Basarılı mı?", f'assets/{selected_link}/success', scrolldown_enabled=True, sensitive=sensitive)
         offset = self.config["payment_solver"][selected_link]["region_offset"]

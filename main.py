@@ -22,7 +22,8 @@ def bitcoinker():
     cmd.link(links[selected_link])
     cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
     # Solve Recaptha
-    cmd.solve_recaptha()
+    if cmd.solve_recaptcha():
+        return
     # _____________________________
     cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
     cmd.wait_for("Claim edilcek.", r'assets\bitcoinker\claim_bitcoin', scrolldown_enabled=True, sensitive=True)
@@ -50,9 +51,10 @@ def bonusbitcoin():
     cmd.link(links[selected_link])
     cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
     # TODO
-    # Solver eklenecek.
-    cmd.solve_recaptha()
-    # .... SOLVER .... 
+    
+    if cmd.solve_recaptcha():
+        return
+    
     cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
 
     cmd.wait_for("Claim edilcek.", f'assets\{selected_link}\claim_now.png', scrolldown_enabled=True, sensitive=True)
