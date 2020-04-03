@@ -1,5 +1,8 @@
 import json
 import os, sys
+import datetime
+
+
 
 
 class JSON():
@@ -21,5 +24,21 @@ class JSON():
     def set(cls, filename, obj):
         with open(filename, 'w') as f:
             json.dump(obj, f, indent=3)
-            
+
+class Logging():
+    @classmethod
+    def write(cls, path, text):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'a+') as f:
+            f.write(text + "\n")
+    @classmethod
+    def success(cls, path):
+        text = f"# Success : {str(datetime.datetime.now()).split('.')[0]}" 
+        cls.write(path, text)
+    
+    @classmethod
+    def fail(cls, path):
+        text = f"# Fail    : {str(datetime.datetime.now()).split('.')[0]}" 
+        cls.write(path, text)
+    
         

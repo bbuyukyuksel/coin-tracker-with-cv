@@ -1,8 +1,8 @@
 {
    "ocr_settings": {
       "tesseract_path": "C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe",
-      "resize": 2,
-      "matching_threshold" : 0.005
+      "resize": 3,
+      "matching_threshold": 0.005
    },
    "links": {
       "base_link": "https://www.linkedin.com/in/buyukyukselburak/",
@@ -12,12 +12,37 @@
       "coinpot": "https://coinpot.co/dashboard"
    },
    "payment_solver": {
-      "info":"test_func.py kodu kullanarak tespit et.",
-      "bitcoinker": {"region_offset": [-20,0,300, 23]},
-      "bonusbitcoin": {"region_offset": [-66,0,116,15]}
+      "info": "resolve_region.py kodu kullanarak tespit et.",
+      "bitcoinker": {
+         "region_offset": [
+            -20,
+            0,
+            300,
+            23
+         ]
+      },
+      "bonusbitcoin": {
+         "region_offset": [
+            -66,
+            0,
+            116,
+            15
+         ]
+      },
+      "freebitco": {
+         "region_offset": [
+            -90,
+            0,
+            130,
+            25
+         ]
+      }
    },
    "location": {
-      "widthxheight":[1920, 1080],
+      "widthxheight": [
+         1920,
+         1080
+      ],
       "base": [
          800,
          500
@@ -39,6 +64,10 @@
       "scrollbar_bottom": [
          950,
          1020
+      ],
+      "temp": [
+         43,
+         563
       ]
    }
 }

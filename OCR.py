@@ -6,11 +6,13 @@ import tools
 from pynput import keyboard as Keyboard
 import time
 import re
+import matching
 
 def fix_false_chs(string):
   CH = {
     "|" : "l",
     " " : "",
+
     
   }
   for i,j in CH.items():
@@ -21,8 +23,34 @@ def doOcr(img, show=False, save=''):
   config = tools.JSON.get("config.json")
   scale = config["ocr_settings"]["resize"]
   img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+  if show:
+    cv2.imshow("before threshold", img)
+    cv2.waitKey(1000)
   ret, th2 = cv2.threshold(img,200,255,cv2.THRESH_BINARY_INV)
+  #th2 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
+            
+  size = tuple(np.array(th2.shape) * scale)
+  size = (int(size[1]), int(size[0])) 
+  sized = cv2.resize(th2.copy(), dsize=size, interpolation=cv2.INTER_CUBIC)
+  if save:
+    cv2.imwrite(save, sized)
+  if show:
+    cv2.imshow("current text", sized)
+    cv2.waitKey(1000)
+    cv2.destroyAllWindows()
+  custom_config = r'--oem 2 --psm 4'
+  return fix_false_chs(pytesseract.image_to_string(sized, config=custom_config))
 
+def doOcr_with_adaptive_threshold(img, show=False, save=''):
+  config = tools.JSON.get("config.json")
+  scale = config["ocr_settings"]["resize"]
+  img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+  if show:
+    cv2.imshow("before threshold", img)
+    cv2.waitKey(1000)
+  #ret, th2 = cv2.threshold(img,200,255,cv2.THRESH_BINARY_INV)
+  th2 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
+            
   size = tuple(np.array(th2.shape) * scale)
   size = (int(size[1]), int(size[0])) 
   sized = cv2.resize(th2.copy(), dsize=size, interpolation=cv2.INTER_CUBIC)
@@ -94,7 +122,7 @@ def resolve_region(region, show=False, save=''):
   img_url_bar = np.array(ss_region) 
   # Convert RGB to BGR 
   img_url_bar = img_url_bar[:, :, ::-1].copy() 
-  result = doOcr(img_url_bar, show, save)
+  result = doOcr_with_adaptive_threshold(img_url_bar, show, save)
   return result
 
 def check_current_url():

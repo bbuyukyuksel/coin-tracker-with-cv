@@ -1,6 +1,7 @@
 import argparse
 import pyautogui
 import OCR
+import matching
 
 from pynput import mouse as Mouse
 
@@ -12,8 +13,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print("args", args)
 
-    
-    pos = pyautogui.locateOnScreen(args.path)
+    pos = matching.matching(args.path, source="screenshot", debug=True,score_threshold=0.005)
+    #pos = pyautogui.locateOnScreen(args.path)
     
     if pos:
         print("Position", list(pos))

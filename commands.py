@@ -185,14 +185,15 @@ class Commands:
                 break
             __critical_alert_flag__ += 1
             self.go_to_top()
-            self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=True)
-            if not self.find_and_click(r'assets/box'):
+            self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=True, sensitive=False)
+            if not self.find_and_click(r'assets/box',sensitive=False):
                 break
             time.sleep(s_time)
 
         __critical_alert_flag__ = 0
         # Kutuya Tıklandı
         pos = self.find(r'assets/solver/person.png', center=True)
+        time.sleep(3)
         if pos:
             # Enable Solver
             while not self.find(r'assets/iamnotarobot-done'):
@@ -201,6 +202,7 @@ class Commands:
 
                 __critical_alert_flag__ += 1
                 pos = self.find(r'assets/solver/person.png', center=True)
+                time.sleep(3)
                 if not pos:
                     continue
                 self.mouse.position = pos

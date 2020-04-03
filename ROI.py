@@ -102,8 +102,8 @@ if __name__ == '__main__':
     #start_mouse_listener()
 
     listener_is_done = False
-    process = ("click-2", "burak")
-    print("Click for burak")
+    process = ("click-1", "test")
+    print("Click for test-1")
     start_mouse_listener()
 
     #listener_is_done = False

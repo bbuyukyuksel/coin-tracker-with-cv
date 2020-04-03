@@ -7,67 +7,12 @@ from pynput import keyboard as Keyboard
 import OCR
 import datetime
 import globals
-
-def bitcoinker():
-    '''
-        Recipe name: bitcoinker
-    '''    
-    _iamnotarobot_ = "assets/iamnotarobot"
-    _iamnotarobot_done_ = "assets/iamnotarobot-done"
-    config = tools.JSON.get("config.json")
-    links = config["links"]
-    cmd = Commands()
-    cmd.is_animation_on = True
-    selected_link = "bitcoinker"
-    cmd.link(links[selected_link])
-    cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
-    # Solve Recaptha
-    if cmd.solve_recaptcha():
-        print("solve_recaptcha fail")
-        return
-    # _____________________________
-    cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
-    cmd.wait_for("Claim edilcek.", r'assets\bitcoinker\claim_bitcoin', scrolldown_enabled=True, sensitive=True)
-    cmd.find_and_click(r'assets\bitcoinker\claim_bitcoin', sensitive=True)
-    time.sleep(2)
-    # Payment Solver
-    cmd.payment_solver(selected_link, sensitive=True)
-    # _____________________________
-    cmd.link("www.google.com")
-
-def bonusbitcoin():
-    '''
-        Recipe name: bonusbitcoin
-    '''
-    _iamnotarobot_ = "assets/iamnotarobot"
-    _iamnotarobot_done_ = "assets/iamnotarobot-done"
-
-    config = tools.JSON.get("config.json")
-    links = config["links"]
-    cmd = Commands()
-    cmd.is_animation_on = True
-    selected_link = "bonusbitcoin"
-    
-    cmd.link(links[selected_link])
-    cmd.wait_for("HTML is done?", f'assets/{selected_link}/htmlisdone.png', scrolldown_enabled=False)
-    
-    if cmd.solve_recaptcha():
-        print("solve_recaptcha fail")
-        return
-    
-    cmd.wait_for("Waiting process done", _iamnotarobot_done_, scrolldown_enabled=False)
-    cmd.wait_for("Claim edilcek.", f'assets\{selected_link}\claim_now.png', scrolldown_enabled=True, sensitive=True)
-    cmd.find_and_click(f'assets\{selected_link}\claim_now.png', sensitive=True)
-    time.sleep(2)
-    
-    cmd.payment_solver(selected_link, sensitive=True)
-    cmd.link("www.google.com")
+from faucets import *
 
 def automate(recipe_handler, sleeptime, stop_event):
     recipe_counter = 1
     while not stop_event.wait(1):
         print(recipe_handler, "çalışıyor..")
-        sleep(sleeptime)
         while globals.WAIT:
             print("Uyuyor")
             sleep(5)
@@ -87,6 +32,7 @@ def automate(recipe_handler, sleeptime, stop_event):
         globals.WAIT = False
         recipe_counter += 1
         print(f"Recipe name: {recipe_handler.__doc__} -> {recipe_counter}. kez gerçekleşti.")
+        sleep(sleeptime)
 
         
 
@@ -107,7 +53,7 @@ if __name__ == '__main__':
     recipe_times = {
         'bitcoinker'   : 5  * 60, # 5 DK
         'bonusbitcoin' : 15 * 60, # 15 DK
-        #'freebitco'    : 60 * 60, # 60 DK 
+        'freebitco'    : 60 * 60, # 60 DK 
     }
 
     listener = Keyboard.Listener(on_release=on_release)
@@ -133,6 +79,7 @@ if __name__ == '__main__':
                     print(str_log)
                     i[1] = Thread(target=automate, args=(eval(i[0]),recipe_times[i[0]], thread_kill_signal))
                     i[1].start()
+                    globals.WAIT = False
 
     
 

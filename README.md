@@ -1,17 +1,18 @@
 # Burak BÜYÜKYÜKSEL
+
+## Bilgisar Görü Tabanlı Bilgisayar Otomasyonu
+
+* https://www.linkedin.com/in/buyukyukselburak/
+
 # Coin Tracker
 pip install -r requirements.txt
 
-## References
-* https://pynput.readthedocs.io/en/latest/index.html
-* Solver : https://github.com/dessant/buster
 
 Komut Listesi
-
-None<link>link
+<link>link
     "ilgili linke git."
 
-None<wait_for>title, path, scrolldown_enabled=False, scrollup_enabled=False, try_limit=3
+<wait_for>title, path, scrollup_enabled=False, try_limit=2, sensitive=False
     "İlgili görsel bulunana kadar bekle."
     +title              = "Başlık"
     +path               = "Hangi görselin bulunması beklenecek." (!) Eğer ki path dizinse, dizin altındaki bütün görseller aranır.
@@ -19,15 +20,33 @@ None<wait_for>title, path, scrolldown_enabled=False, scrollup_enabled=False, try
     +scrollup_enabled   = "Görsel aranırken scrollbar yukarıya kaydırılsın mı?"
     +try_limit          = "Eğer aramada scrolldown_enabled aktifse ve sayfa sonuna kadar içerik bulunamamışsa, sayfa başına gidilir ve counter arttırılır. Counter limit dolduğunda arama sonlandırılır.
 
-find_and_click>path
+<find_and_click>path, sensitive=True
     "İlgili görselin merkezi tespit edilip, tıklanır."
     +path               = "Bulunacak imgenin dosya konumu."
 
 Extra:
-    go_to_top
-    go_to_bottom
-    '' or ImgePozisyonu <find>path, center=False
+    <go_to_top>
+    <go_to_bottom>
+    <find>path, center=False
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## References
+* https://pynput.readthedocs.io/en/latest/index.html
+* Solver : https://github.com/dessant/buster
 
 #Name:Bitcoinker
 link>https://bitcoinker.com/
