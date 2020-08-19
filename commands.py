@@ -18,7 +18,8 @@ class Commands:
 
     mouse = Mouse.Controller()
     keyboard = Keyboard.Controller()
-    config = tools.JSON.get("config.json") 
+    config = tools.JSON.get("config.json")
+    selected_link = None 
 
     def ctrl_(self, key):
         with self.keyboard.pressed(Keyboard.Key.ctrl_l):
@@ -45,8 +46,19 @@ class Commands:
         self.type(url)
         self.enter()
     
-    def click_l(self, count = 1):
+    def click_r(self, count=1):
+        self.mouse.click(Mouse.Button.right, count)
+
+    def click_l(self, count = 1, close_after_click=True):
+        '''
+         if new tab is opened return [True] or return [False]
+        '''
         self.mouse.click(Mouse.Button.left, count)
+        time.sleep(2)
+
+        if not close_after_click:
+            return False
+        
         # Check URL
         if OCR.check_current_url():
             time.sleep(1)
@@ -57,7 +69,6 @@ class Commands:
     def scrolldown(self, s_time=None):
         if self.find("assets/process/eof"):
             return "eof"
-        
         self.mouse.position = self.config["location"]["scrollbar_bottom"]
         if s_time is None:
             self.click_l()
@@ -79,11 +90,15 @@ class Commands:
             self.mouse.release(Mouse.Button.left)
     
     def find(self, path, center=False, sensitive=False):
+        '''
+            Return [Center of Image's Position] or [None]
+        '''
         pos = None
         if not os.path.isdir(path):
-            base_pos = list(self.config["location"]['widthxheight'])
-            self.mouse.position = ((base_pos[0]//2)+50,base_pos[1]//2)
-            
+            #base_pos = list(self.config["location"]['widthxheight'])
+            #self.mouse.position = ((base_pos[0]//2)+50,base_pos[1]//2)
+            self.mouse.position = self.config["location"]['base']
+
             if sensitive:
                 print(">> Sensitive Mode: Enabled")
                 pos = matching.matching(template_img_path=path, source="screenshot", debug=False, score_threshold=self.config["ocr_settings"]['matching_threshold'], center=center)
@@ -96,7 +111,8 @@ class Commands:
             if pos:
                 print(">> found:", path)
             else:
-                print(">> not found:", path)
+                #print(">> not found:", path)
+                pass
             
             return pos
 
@@ -109,13 +125,23 @@ class Commands:
                     return pos
             return None
             
-    def find_and_click(self, path, sensitive=False):
+    def find_and_click(self, path, sensitive=False, close_after_click=True):
+        '''
+            if find function is successed : 
+                return [True]  : new tab opened
+                return [False] : new tab is not opened
+            else
+                return None
+        '''
         pos = self.find(path, center=True, sensitive=True) 
-        self.mouse.position = pos
-        return self.click_l()
+        if pos:
+            self.mouse.position = pos
+            return self.click_l(close_after_click=close_after_click) #if new tab is opened return True
+        return None
+        
 
         
-    def wait_for(self, title, path, scrolldown_enabled=False, try_limit=2, sensitive=False, timeout = None):
+    def wait_for(self, title, path, scrolldown_enabled=False, try_limit=1, sensitive=False, timeout = None):
         trying = 0
         __alert__ = 0
         __timeout_flag__ = False
@@ -161,38 +187,55 @@ class Commands:
         return __timeout_flag__ or __exit_flag__
     
     def go_to_top(self):
+        '''
+            if there is an alert return [True], else [False]
+        '''
+        __alert__ = 0
         while True:
+            if __alert__ > 20:
+                return True
             is_bof = self.scrollup()
             if is_bof:
                 print(">> BOF")
                 break
+            else:
+                __alert__ += 1
             time.sleep(1)
+        return False
 
     def go_to_bottom(self):
+        __alert__ = 0
         while True:
+            if __alert__ > 20:
+                return True
             is_eof = self.scrolldown()
             if is_eof:
                 print(">> EOF")
                 break
+            else:
+                __alert__ += 1
             time.sleep(1)
-    
-    def solve_recaptcha(self, s_time=2):
+        return False
+        
+    def solve_recaptcha(self, s_time=2, firstly_go_to_top=True, scrolldown_enabled=True):
         __critical_alert_flag__ = 0
         __critical_alert_count__ = 15
 
         while True:
             if __critical_alert_flag__ > __critical_alert_count__:
                 break
+
             __critical_alert_flag__ += 1
-            self.go_to_top()
-            self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=True, sensitive=False)
+            if firstly_go_to_top:
+                self.go_to_top()
+            self.wait_for("I'am not a robot bulunacak.", r'assets/iamnotarobot', scrolldown_enabled=scrolldown_enabled, sensitive=False)
             if not self.find_and_click(r'assets/box',sensitive=False):
                 break
             time.sleep(s_time)
 
         __critical_alert_flag__ = 0
         # Kutuya Tıklandı
-        pos = self.find(r'assets/solver/person.png', center=True)
+        pos = self.find(r'assets/solver/person', center=True)
         time.sleep(3)
         if pos:
             # Enable Solver
@@ -201,15 +244,15 @@ class Commands:
                     break
 
                 __critical_alert_flag__ += 1
-                pos = self.find(r'assets/solver/person.png', center=True)
-                time.sleep(3)
+                pos = self.find(r'assets/solver/person', center=True)
+                time.sleep(4)
                 if not pos:
                     continue
                 self.mouse.position = pos
                 self.click_l()
-                refresh_flag = self.wait_for("Process'in kabulü bekleniyor...", f"assets/iamnotarobot-done", timeout=30)
+                refresh_flag = self.wait_for("Process'in kabulü bekleniyor...", f"assets/iamnotarobot-done", timeout=30, scrolldown_enabled=scrolldown_enabled)
                 if refresh_flag:
-                    refresh_pos = self.find(r'assets/solver/refresh.png', center=True)
+                    refresh_pos = self.find(r'assets/solver/refresh', center=True)
                     if refresh_pos:
                         self.mouse.position = refresh_pos
                         self.click_l()
@@ -240,8 +283,25 @@ class Commands:
         else:
             print("Could not detect payment solver image")
                 
-                
+    def close_other_tabs(self):
+        time.sleep(2)
+        pos = self.find(r'assets/localhost.png', center=True)
+        if pos:
+            self.mouse.position = pos
+            self.click_r()
+            time.sleep(0.5)
+            pos = self.find(r'assets/close_other_tabs.png', center=True)
+            if pos:
+                self.mouse.position = pos
+                self.click_l(close_after_click=False)
+                time.sleep(2)
+
+
 if __name__ == '__main__':
+    
+    cmd = Commands()
+    cmd.close_other_tabs()
+    exit()
     while True:
         bonusbitcoin()
         bitcoinker()

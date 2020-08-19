@@ -32,13 +32,13 @@ class Logging():
         with open(path, 'a+') as f:
             f.write(text + "\n")
     @classmethod
-    def success(cls, path):
-        text = f"# Success : {str(datetime.datetime.now()).split('.')[0]}" 
+    def success(cls, path, content = ''):
+        text = f"# Success : {str(datetime.datetime.now()).split('.')[0]}, {content}" 
         cls.write(path, text)
     
     @classmethod
-    def fail(cls, path):
-        text = f"# Fail    : {str(datetime.datetime.now()).split('.')[0]}" 
+    def fail(cls, path, content = ''):
+        text = f"# Fail    : {str(datetime.datetime.now()).split('.')[0]}, {content}" 
         cls.write(path, text)
     
         

@@ -9,7 +9,14 @@
       "bonusbitcoin": "http://bonusbitcoin.co/faucet",
       "bitcoinker": "https://bitcoinker.com/",
       "freebitco": "https://freebitco.in/",
-      "coinpot": "https://coinpot.co/dashboard"
+      "bitfun" : "http://bitfun.co/dice",
+      "moonbit": "https://moonbit.co.in/faucet",
+      "moondoge":"https://moondoge.co.in/faucet",
+      "moonlite":"https://moonliteco.in/faucet",
+      "moondash":"https://moondash.co.in/faucet",
+      "moonbitcoincash":"https://moonbitcoin.cash/faucet",
+      "coinpot": "https://coinpot.co/dashboard",
+      "localhost":"https://www.localhost.com/in/buyukyukselburak/"
    },
    "payment_solver": {
       "info": "resolve_region.py kodu kullanarak tespit et.",
@@ -36,6 +43,14 @@
             130,
             25
          ]
+      },
+      "bitfun": {
+         "region_offset": [
+            -28,
+            0,
+            100,
+            34
+         ]
       }
    },
    "location": {
@@ -44,8 +59,8 @@
          1080
       ],
       "base": [
-         800,
-         500
+         1825, 
+         740
       ],
       "url_area": [
          172,
@@ -66,7 +81,7 @@
          1020
       ],
       "temp": [
-         43,
+         10,
          563
       ]
    }
