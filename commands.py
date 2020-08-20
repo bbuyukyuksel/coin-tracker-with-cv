@@ -20,6 +20,24 @@ class Commands:
     keyboard = Keyboard.Controller()
     config = tools.JSON.get("config.json")
     selected_link = None 
+    SCREEN_SIZE = pyautogui.size()
+    
+    def setMousePosition(self, pos:list):
+        self.mouse.position = pos
+        return self
+    def getMousePosition(self):
+        return self.mouse.position
+
+    def resetMousePosition(self):
+        self.setMousePosition(self.SCREEN_SIZE)
+
+    def F_(self, key:int, delay=None):
+        if delay: time.sleep(delay)
+        key = eval(f"Keyboard.Key.f{key}")
+        self.keyboard.press(key)
+        self.keyboard.release(key)
+        if delay: time.sleep(delay)
+
 
     def ctrl_(self, key):
         with self.keyboard.pressed(Keyboard.Key.ctrl_l):
@@ -32,6 +50,8 @@ class Commands:
                 time.sleep(self.animation_time)
         else:
             self.keyboard.type(text)
+        return self
+        
     def enter(self):
         self.keyboard.press(Keyboard.Key.enter)
         self.keyboard.release(Keyboard.Key.enter)

@@ -12,8 +12,6 @@ def fix_false_chs(string):
   CH = {
     "|" : "l",
     " " : "",
-
-    
   }
   for i,j in CH.items():
     string = string.replace(i, j)
@@ -99,9 +97,6 @@ def close_tab_with_ctrl_tab():
     keyboard.press('w')
     keyboard.release('w')
   
-
-  
-
 def resolve_url():
   if '__first_trigger__' not in resolve_url.__dict__:    
     config = tools.JSON.get("config.json")
